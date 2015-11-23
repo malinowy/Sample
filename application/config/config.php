@@ -17,7 +17,9 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | environments.
 |
 */
-$config['base_url'] = 'http://localhost:8888/ci';
+$config['base_url'] = 'http://localhost:8888/ci_2/';
+
+$config['server_root'] = $_SERVER['DOCUMENT_ROOT'];
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +31,7 @@ $config['base_url'] = 'http://localhost:8888/ci';
 | variable so that it is blank.
 |
 */
-$config['index_page'] = '';
+$config['index_page'] = 'index.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -416,7 +418,7 @@ $config['standardize_newlines'] = FALSE;
 |          for backwards compatibility purposes!
 |
 */
-$config['global_xss_filtering'] = FALSE;
+$config['global_xss_filtering'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------

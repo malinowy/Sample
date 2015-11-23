@@ -1,88 +1,84 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Site extends CI_Controller {
 
-        public  function index() {
-            $this->home();
+// verify if session is set colling method is_logged_in()
+    function __construct() {
+        parent::__construct();
+        $this->is_logged_in();
+    }
+
+    function index() {
+        $this->load->model('data_model');
+        $data["rows"] = $this->data_model->getAll();
+
+        $this->load->view('home', $data);
+    }
+
+    function about() {
+        $this->load->view('about');
+    }
+
+    // get data from DB ad load options_view.php
+    function options() {
+        $data = array();
+
+        if ($query = $this->site_model->get_records()){
+            $data['records'] = $query;
         }
 
-         public  function home() {
-            // colling model model_get.php
-            $this->load->model("model_get");
-            // arrat 'results' will store all data from row 'home' from DB
-            $data["results"] = $this->model_get->getData("home");
+        $this->load->view('options_view', $data);
+    }
 
-            $this->load->view('site_header');
-            $this->load->view('site_nav');
-            $this->load->view('content_home', $data); //adding to content_home all data from DB
-            $this->load->view('site_footer');
 
+    //create a new entry in DB and load options_view.php through options method
+    function create() {
+        $data = array(
+                // same as $_POST['title']
+                'title' => $this->input->post('title'),
+                'contents' => $this->input->post('contents')
+            );
+        // in order to call site_model we open the autoload.php from config folder
+        // find the line $autoload['model'] = array('site_model');
+        $this->site_model->add_record($data);
+        // we reload the options_view.php file
+        $this->options();
+    }
+
+    // update the entry, using data from update method
+    // need to work on this
+    function update(){
+        $data = array(
+                'title' => 'My freshley Updated Title',
+                'contents' => 'Content should be here; it is updated.'
+            );
+
+        $this->site_model->update_record($data);
+
+        // we reload the options_view.php file
+        $this->options();
+    }
+
+    // delete the entry by id and reload the options_view.php file
+    function delete() {
+        $this->site_model->delete_row();
+         $this->options();
+    }
+
+    function members_area() {
+        $this->load->view('members_area');
+    }
+
+    function is_logged_in() {
+        $is_logged_in = $this->session->userdata('is_logged_in');
+
+        if (!isset($is_logged_in) || $is_logged_in != true) {
+
+            //this is not a right wa to do, need to work on it.
+            echo 'You don\'t have permission to access this page. <a href="../login">Login</a>';
+            die();
         }
-
-        public  function about() {
-            // colling model model_get.php
-            $this->load->model("model_get");
-            // arrat 'results' will store all data from row 'home' from DB
-            $data["results"] = $this->model_get->getData("about");
-            $this->load->view('site_header');
-            $this->load->view('site_nav');
-            $this->load->view('content_about', $data);
-            $this->load->view('site_footer');
-
-        }
-
-        public function contact() {
-
-            $this->load->view('site_header');
-            $this->load->view('site_nav');
-            $this->load->view('content_contact');
-            $this->load->view('site_footer');
-        }
-
-        public function send_email() {
-            $this->load->library("form_validation");
-
-            //xss_clean codition prevent anyone doing crosssite scrpting into input fields - for security - for some reason it does not work
-            /*$this->form_validation->set_rules("fullName", "Full Name", "required|trim|alpha|xss_clean");
-            $this->form_validation->set_rules("email", "Email Address", "required|trim|valid_email|xss_clean");
-            $this->form_validation->set_rules("message", "Message", "required|trim|xss_clean");*/
-
-            $this->form_validation->set_rules("fullName", "Full Name", "required");
-            $this->form_validation->set_rules("email", "Email Address", "required");
-            $this->form_validation->set_rules("message", "Message", "required");
-
-                if ($this->form_validation->run() == FALSE) {
-                    $data["message"] = "";
-
-                    $this->load->view('site_header');
-                    $this->load->view('site_nav');
-                    $this->load->view('content_contact', $data);
-                    $this->load->view('site_footer');
-                }
-                  else {
-                       $data["message"] = "The email has successfully been sent!";
-
-                       // to send emails
-                       $this->load->library("email");
-
-                       $this->email->from(set_value("email"), set_value("fullName"));
-                       $this->email->to("artvekinc@yahoo.com");
-                       $this->email->subject("Mesage from website");
-                       $this->email->message(set_value("message"));
-
-                       $this->email->send();
-
-                       echo $this->email->print_debugger();
+    }
 
 
-                       $this->load->view('site_header');
-                       $this->load->view('site_nav');
-                       $this->load->view('content_contact', $data);
-                       $this->load->view('site_footer');
-                  }
-        }
-
-
-
- }
+}
