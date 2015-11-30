@@ -18,8 +18,8 @@
 
         <?php
                 echo form_input('username', set_value('username', 'Username'));
-                echo form_input('password', set_value('pasword', 'Password'));
-                echo form_input('password2', set_value('pasword2', 'Password Confirm'));
+                echo form_password('password', set_value('pasword', 'Password'));
+                echo form_password('password2', set_value('pasword2', 'Password Confirm'));
 
                 echo form_submit('submit', 'Create Account');
          ?>
